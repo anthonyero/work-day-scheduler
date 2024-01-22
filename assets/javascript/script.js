@@ -14,15 +14,66 @@ $(function () {
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
 
+    // Check if local storage contains a workdaySchedule, if not create one that is an empty object
+    var currentDay = dayjs().format("MM/DD/YYYY");
+
+  if (localStorage.getItem("workdaySchedule") === null || JSON.parse(localStorage.getItem("workdaySchedule"))["date"] !== currentDay) { // Second condition check's if local storage is for today's date, if not, will clear
+    localStorage.setItem("workdaySchedule", JSON.stringify({
+      date: currentDay,
+      hour9: "",
+      hour10: "",
+      hour11: "",
+      hour12: "",
+      hour13: "",
+      hour14: "",
+      hour15: "",
+      hour16: "",
+      hour17: ""}
+      ));
+  } 
+
+  // If a user refreshes the page or revisits the page, the following code will write stored values to the description 
+  todaysWorkdaySchedule = JSON.parse(localStorage.getItem("workdaySchedule"));
+
+  for (key in todaysWorkdaySchedule) {
+    if (key != "date"){
+      idName = key;
+      idName = idName.slice(0,4) + "-" + idName.slice(4)
+      console.log(idName);
+      $("#" + idName + " > .description").text(todaysWorkdaySchedule[key]);
+    }
+  }
+
+
+
 
   
   $(".container-lg").on("click", ".saveBtn", function (event) {
+
     let target = event.target;
     console.log($(target).parent().attr("id")); // Finds the id of the target's parent element
     // Add a function to retrieve the local storage object, update key values, and save to local storage again
-    
-    
-  })
+    // event.preventDefault(); 
+
+ 
+  // Finds the ID of the target's parent element, providing us the id of the hour block
+  var targetParentId = $(target).parent().attr("id");
+  //console.log("targetParentId: " + targetParentId  + "typeof: " + typeof(targetParentId))
+  var userInputTarget = ("#" + targetParentId + " > .description"); // Finds the text box of the 
+  //console.log("userInputTarget: " + userInputTarget + "typeof: " + typeof(userInputTarget));
+
+  // 
+  var keyTarget = targetParentId;
+  keyTarget = keyTarget.split("-").join("");
+  console.log("keyTarget: " + keyTarget)
+
+  // Pulls from local storage, updates key values, and places the values back into local storage
+  currentWorkdaySchedule = JSON.parse(localStorage.getItem("workdaySchedule"));
+  currentWorkdaySchedule[keyTarget] = $(userInputTarget).val();
+  localStorage.setItem("workdaySchedule", JSON.stringify(currentWorkdaySchedule));
+
+  // Not necessary to rewrite from local storage. When a user types or updates a value and saves, their text will remain within the container. If the page is refreshed, the updated text will also be published 
+})
 
 
 
@@ -59,3 +110,23 @@ function renderHours (hour) {
   $(".container-lg").append('</div>');
   }
  
+function recordResponse (event) {
+  event.preventDefault(); 
+
+  // Check if local storage contains a workdaySchedule, if not create one that is an empty object
+  if (localStorage.getItem("workdaySchedule") === null) {
+    localStorage.setItem("workdaySchedule", JSON.stringify({}));
+  }
+
+  var targetParentId = $(target).parent().attr("id");
+  var userInputTarget = $("#" + targetParentId + "> description");
+
+  var keyTarget = targetParentId;
+  keyTarget = keyTarget.split("-").join("");
+
+  currentWorkdaySchedule = JSON.parse(localStorage.getItem("workdaySchedule"));
+  currentWorkdaySchedule[keyTarget] = $(userInputTarget).val();
+  currentWorkdaySchedule = currentWorkdaySchedule.sort(function(a, b){return a - b});
+  localStorage.setItem("workdaySchedule", JSON.stringify(currentWorkdaySchedule));
+
+}
