@@ -2,25 +2,29 @@
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
 $(function () {
+
+  for (i = 9; i < 18; i++){
+    renderHours(i)
+  }
+
   // TODO: Add a listener for click events on the save button. This code should
   // use the id in the containing time-block as a key to save the user input in
   // local storage. HINT: What does `this` reference in the click listener
   // function? How can DOM traversal be used to get the "hour-x" id of the
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
+
+
   
-  /*
-  $(".container-lg").append('<div id = "hour-' + 12 + '" class= "row time-block present">')
-  $("#hour-12").append('<div class="col-2 col-md-1 hour text-center py-3">' + 12 + 'PM</div>');
-  $("#hour-12").append('<textarea class="col-8 col-md-10 description" rows="3"> TEXT</textarea>');
-  $("#hour-12").append('<button class="btn saveBtn col-2 col-md-1" aria-label="save">');
-  $("#hour-12 > button").append('<i class="fas fa-save" aria-hidden="true"></i>');
-  $("#hour-12").append('</button>');
-  $(".container-lg").append('</div>');
-  */
-  for (i = 9; i < 18; i++){
-    renderHours(i)
-  }
+  $(".container-lg").on("click", ".saveBtn", function (event) {
+    let target = event.target;
+    console.log($(target).parent().attr("id")); // Finds the id of the target's parent element
+    // Add a function to retrieve the local storage object, update key values, and save to local storage again
+    
+    
+  })
+
+
 
 
   //
