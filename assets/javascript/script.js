@@ -30,7 +30,20 @@ $(function () {
       hour16: "",
       hour17: ""}
       ));
+  } 
+
+  // If a user refreshes the page or revisits the page, the following code will write stored values to the description 
+  todaysWorkdaySchedule = JSON.parse(localStorage.getItem("workdaySchedule"));
+
+  for (key in todaysWorkdaySchedule) {
+    if (key != "date"){
+      idName = key;
+      idName = idName.slice(0,4) + "-" + idName.slice(4)
+      console.log(idName);
+      $("#" + idName + " > .description").text(todaysWorkdaySchedule[key]);
+    }
   }
+
 
 
 
@@ -59,10 +72,8 @@ $(function () {
   currentWorkdaySchedule[keyTarget] = $(userInputTarget).val();
   localStorage.setItem("workdaySchedule", JSON.stringify(currentWorkdaySchedule));
 
-  // Writing to HTML
-
-
-  })
+  // Not necessary to rewrite from local storage. When a user types or updates a value and saves, their text will remain within the container. If the page is refreshed, the updated text will also be published 
+})
 
 
 
