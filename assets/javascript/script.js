@@ -3,21 +3,15 @@
 // in the html.
 $(function () {
 
+  // Renders divs to HTML markup by calling the `renderHours` function
   for (i = 9; i < 18; i++){
     renderHours(i)
   }
 
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
+  // Check if local storage contains a workdaySchedule, if not create one that is an empty object
+  var currentDay = dayjs().format("MM/DD/YYYY");
 
-    // Check if local storage contains a workdaySchedule, if not create one that is an empty object
-    var currentDay = dayjs().format("MM/DD/YYYY");
-
-  if (localStorage.getItem("workdaySchedule") === null || JSON.parse(localStorage.getItem("workdaySchedule"))["date"] !== currentDay) { // Second condition check's if local storage is for today's date, if not, will clear
+  if (localStorage.getItem("workdaySchedule") === null || JSON.parse(localStorage.getItem("workdaySchedule"))["date"] !== currentDay) { // Second condition checkss if local storage is for today's date, if not, will clear
     localStorage.setItem("workdaySchedule", JSON.stringify({
       date: currentDay,
       hour9: "",
@@ -38,74 +32,53 @@ $(function () {
   for (key in todaysWorkdaySchedule) {
     if (key != "date"){
       idName = key;
-      idName = idName.slice(0,4) + "-" + idName.slice(4)
-      console.log(idName);
+      idName = idName.slice(0,4) + "-" + idName.slice(4) // Adds a hyphen to coincide with block id names. Hyphens are not used in the object saved in local storage
       $("#" + idName + " > .description").text(todaysWorkdaySchedule[key]);
     }
   }
 
-
-
-
+  // Applying eventListeners to each save button element and defining a function to update local storage
   
   $(".container-lg").on("click", ".saveBtn", function (event) {
 
     let target = event.target;
-    console.log($(target).parent().attr("id")); // Finds the id of the target's parent element
-    // Add a function to retrieve the local storage object, update key values, and save to local storage again
     // event.preventDefault(); 
 
- 
-  // Finds the ID of the target's parent element, providing us the id of the hour block
-  var targetParentId = $(target).parent().attr("id");
-  //console.log("targetParentId: " + targetParentId  + "typeof: " + typeof(targetParentId))
-  var userInputTarget = ("#" + targetParentId + " > .description"); // Finds the text box of the 
-  //console.log("userInputTarget: " + userInputTarget + "typeof: " + typeof(userInputTarget));
+    // Finds the ID of the target's parent element, providing us the id of the hour block
+    var targetParentId = $(target).parent().attr("id"); // Returns a string of the parent element's id attribute
+    var userInputTarget = ("#" + targetParentId + " > .description"); // Finds the text box of the hour's row/container
 
-  // 
-  var keyTarget = targetParentId;
-  keyTarget = keyTarget.split("-").join("");
-  console.log("keyTarget: " + keyTarget)
+    // Removes the hyphen from the retrieved id because the keys in local storage do not contain the hyphen
+    var keyTarget = targetParentId;
+    keyTarget = keyTarget.split("-").join("");
 
-  // Pulls from local storage, updates key values, and places the values back into local storage
-  currentWorkdaySchedule = JSON.parse(localStorage.getItem("workdaySchedule"));
-  currentWorkdaySchedule[keyTarget] = $(userInputTarget).val();
-  localStorage.setItem("workdaySchedule", JSON.stringify(currentWorkdaySchedule));
+    // Pulls from local storage, updates key values, and places the values back into local storage
+    currentWorkdaySchedule = JSON.parse(localStorage.getItem("workdaySchedule"));
+    currentWorkdaySchedule[keyTarget] = $(userInputTarget).val();
+    localStorage.setItem("workdaySchedule", JSON.stringify(currentWorkdaySchedule));
 
   // Not necessary to rewrite from local storage. When a user types or updates a value and saves, their text will remain within the container. If the page is refreshed, the updated text will also be published 
-})
+  })
 
+  // Applies formatting by adding/removing classes past/present/future
+  var currentHour = dayjs().hour()
 
-
-
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-var currentHour = dayjs().hour()
-
-for (i = 9; i < 18; i++){
-  if (i < currentHour) {
-    $("#hour-" + i).removeClass("present future").addClass("past");
-  } else if (i === currentHour) {
-    $("#hour-" + i).removeClass("past future").addClass("present");
-  } else {
-    $("#hour-" + i).removeClass("past present").addClass("future");
+  for (i = 9; i < 18; i++){
+    if (i < currentHour) {
+      $("#hour-" + i).removeClass("present future").addClass("past");
+    } else if (i === currentHour) {
+      $("#hour-" + i).removeClass("past future").addClass("present");
+    } else {
+      $("#hour-" + i).removeClass("past present").addClass("future");
+    }
   }
-}
 
-
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
+  // Retrieves the current date and assigns it to the HTML markup 
   var today = dayjs();
   $("#currentDay").text(today.format("dddd, MMMM D")); // Did not see formatting options for adding the suffix st, rd, th, etc. from DayJS documentation
 });
+
+// Function Definitions
 
 function renderHours (hour) {
   $(".container-lg").append('<div id = "hour-' + hour + '" class= "row time-block">') // Removed past,present,future for the general function
@@ -123,23 +96,3 @@ function renderHours (hour) {
   $(".container-lg").append('</div>');
   }
  
-function recordResponse (event) {
-  event.preventDefault(); 
-
-  // Check if local storage contains a workdaySchedule, if not create one that is an empty object
-  if (localStorage.getItem("workdaySchedule") === null) {
-    localStorage.setItem("workdaySchedule", JSON.stringify({}));
-  }
-
-  var targetParentId = $(target).parent().attr("id");
-  var userInputTarget = $("#" + targetParentId + "> description");
-
-  var keyTarget = targetParentId;
-  keyTarget = keyTarget.split("-").join("");
-
-  currentWorkdaySchedule = JSON.parse(localStorage.getItem("workdaySchedule"));
-  currentWorkdaySchedule[keyTarget] = $(userInputTarget).val();
-  currentWorkdaySchedule = currentWorkdaySchedule.sort(function(a, b){return a - b});
-  localStorage.setItem("workdaySchedule", JSON.stringify(currentWorkdaySchedule));
-
-}
